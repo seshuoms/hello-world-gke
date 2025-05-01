@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: hello-world-458306
-  GAR_LOCATION: us-east1
+  GAR_LOCATION: us-central1
   CLUSTER_NAME: hello-cluster
   DEPLOYMENT_NAME: hello-deployment
   REPOSITORY: hello-repo

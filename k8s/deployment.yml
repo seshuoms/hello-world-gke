@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-world-service
+  name: hello-world-deployment
   labels:
-    app: hello-world-service
+    app: hello-world
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hello-world-service
+      app: hello-world
   template:
     metadata:
       labels:
-        app: hello-world-service
+        app: hello-world
     spec:
       containers:
-        - name: hello-world-service
-          image: gcr.io/hello-world-458306/hello-world-service:latest
+        - name: hello-world-container
+          image: us-central1-docker.pkg.dev/hello-world-458306/hello-repo/hello:latest
           ports:
             - containerPort: 8080
           env:
@@ -35,9 +35,9 @@ kind: Service
 metadata:
   name: hello-world-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer  # Changed to LoadBalancer to expose the app publicly
   selector:
-    app: hello-world-service
+    app: hello-world
   ports:
     - protocol: TCP
       port: 80
