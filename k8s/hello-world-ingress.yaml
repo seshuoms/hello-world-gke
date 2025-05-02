@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-world-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: hello-world-ip
+    networking.gke.io/managed-certificates: hello-world-cert
+    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.class: "gce"
+spec:
+  rules:
+  - host: app.plsitsolutions.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-world-service-prod
+            port:
+              number: 80
+  - host: www.plsitsolutions.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-world-service-prod
+            port:
+              number: 80
+  - host: plsitsolutions.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-world-service-prod
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - app.plsitsolutions.com
+    - www.plsitsolutions.com
+    - plsitsolutions.com
+    secretName: tls-secret

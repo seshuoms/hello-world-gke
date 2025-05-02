@@ -8,7 +8,7 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - host: hello.example.com
+  - host: app.plsitsolutions.com
     http:
       paths:
       - path: /

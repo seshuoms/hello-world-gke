@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hello-world-container
-          image: us-central1-docker.pkg.dev/hello-world-458306/hello-repo/hello:latest
+          image: us-east1-docker.pkg.dev/hello-world-458306/hello-repo/hello:latest
           ports:
             - containerPort: 8080
           env:
