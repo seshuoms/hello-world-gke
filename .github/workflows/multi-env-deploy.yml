@@ -1,0 +1,55 @@
+name: CI/CD for Docker + GKE (Multi-Env)
+
+on:
+  push:
+    branches:
+      - main
+      - stage
+      - dev
+
+env:
+  GAR_LOCATION: us-east1
+  CLUSTER_NAME: hello-cluster
+  DEPLOYMENT_NAME: hello-deployment
+  REPOSITORY: hello-repo
+  IMAGE: hello
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        export_default_credentials: true
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.ref_name }} .
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.ref_name }}
+
+    - name: Set up GKE Credentials
+      run: |
+        gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region ${{ env.GAR_LOCATION }}
+
+    - name: Deploy to GKE
+      run: |
+        if [[ "${{ github.ref_name }}" == "main" ]]; then
+          kubectl apply -f k8s/deployment-prod.yaml
+        elif [[ "${{ github.ref_name }}" == "stage" ]]; then
+          kubectl apply -f k8s/deployment-stage.yaml
+        else
+          kubectl apply -f k8s/deployment-dev.yaml
+        fi
